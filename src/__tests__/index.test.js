@@ -36,3 +36,18 @@ test('create element with three child', function () {
     },
   });
 });
+
+test('create composite element', function() {
+  function TestComponent() {}
+  expect(<TestComponent />).toEqual({
+    type: TestComponent,
+    props: { children: [] }
+  });
+})
+
+test('should return mounted node', function() {
+  function TestComponent() { return <div></div>; }
+  const node = React.mount(<TestComponent />);
+  const expected = document.createElement('div');
+  expect(node).toEqual(expected);
+});
