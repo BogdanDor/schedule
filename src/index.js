@@ -16,13 +16,17 @@ class Schedule {
       publicInstanse = type(props);
       return this.mount(publicInstanse);
     } else if (isHostElement(type)) {
-      const node = document.createElement(type);
+      const parentNode = document.createElement(type);
       Object.keys(props).forEach(propName => {
         if (propName !== 'children') {
           node.setAttribute(propName, props[propName]);
         }
       });
-      return node;
+      props.children.forEach(child => {
+        const childNode = this.mount(child);
+        parentNode.appendChild(childNode);
+      });
+      return parentNode;
     }
   }  
 }
