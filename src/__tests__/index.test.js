@@ -1,4 +1,3 @@
-import React from '../React';
 import render from '../index';
 import { JSDOM } from 'jsdom';
 
@@ -14,21 +13,52 @@ beforeEach(() => {
 });
 
 test('should mount element to container', function() {
-  function TestComponent() { return <div></div>; }
-  render(<TestComponent />, container);
+  render({
+    type: 'div',
+    props: { children: [] }
+  }, container);
   expect(container.outerHTML).toEqual('<div id="container"><div></div></div>');
 });
 
 test('should expand tree', function() {
-  function InnerComponent() { return <div></div>; }
-  function ExternalComponent() { return <InnerComponent />; }
-  render(<ExternalComponent />, container);
+  function InnerComponent() { 
+    return {
+      type: 'div',
+      props: { children: [] }
+    }; 
+  }
+  function ExternalComponent() { 
+    return {
+      type: InnerComponent,
+      props: { children: [] }
+    }; 
+  }
+  render({
+    type: ExternalComponent,
+    props: { children: [] }
+  }, container);
   expect(container.outerHTML).toEqual('<div id="container"><div></div></div>');
 });
 
 test('should expand tree that contains composite component inside host', function() {
-  function InnerComponent() { return <div></div>; }
-  function ExternalComponent() { return <div><InnerComponent /></div>; }
-  render(<ExternalComponent />, container);
+  function InnerComponent() { 
+    return {
+      type: 'div',
+      props: { children: [] }
+    }; 
+  }
+  function ExternalComponent() { 
+    return {
+      type: 'div',
+      props: { children: [{
+        type: InnerComponent,
+        props: { children: [] }
+      }]}
+    };
+  }
+  render({
+    type: ExternalComponent,
+    props: { children: [] }
+  }, container);
   expect(container.outerHTML).toEqual('<div id="container"><div><div></div></div></div>')
 });
