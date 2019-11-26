@@ -1,26 +1,34 @@
 import React from '../React';
-import mount from '../index';
+import render from '../index';
+import { JSDOM } from 'jsdom';
 
-test('should return mounted node', function() {
+let container;
+
+beforeAll(() => {
+  container = document.createElement('div');
+  container.setAttribute('id', 'container');
+});
+
+beforeEach(() => {
+  container.innerHTML = '';
+});
+
+test('should mount element to container', function() {
   function TestComponent() { return <div></div>; }
-  const node = mount(<TestComponent />);
-  const expected = document.createElement('div');
-  expect(node).toEqual(expected);
+  render(<TestComponent />, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div></div></div>');
 });
 
 test('should expand tree', function() {
   function InnerComponent() { return <div></div>; }
   function ExternalComponent() { return <InnerComponent />; }
-  const node = mount(<ExternalComponent />);
-  const expected = document.createElement('div');
-  expect(node).toEqual(expected);
+  render(<ExternalComponent />, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div></div></div>');
 });
 
-test('should expand tree', function() {
+test('should expand tree that contains composite component inside host', function() {
   function InnerComponent() { return <div></div>; }
   function ExternalComponent() { return <div><InnerComponent /></div>; }
-  const node = mount(<ExternalComponent />);
-  const expected = document.createElement('div');
-  expected.appendChild(document.createElement('div'));
-  expect(node).toEqual(expected);
+  render(<ExternalComponent />, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div><div></div></div></div>')
 });

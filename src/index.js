@@ -35,4 +35,9 @@ function mount(element) {
   }
 }
 
-export default mount;
+function render(element, container) {
+  const node = mount(element);
+  container.appendChild(node);
+}
+
+export default render;
