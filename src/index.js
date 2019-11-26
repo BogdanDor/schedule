@@ -3,6 +3,10 @@ function render(element, container) {
   container.appendChild(rootComponent.mount());
 }
 
+function unmountComponentAtNode(container) {
+  container.innerHTML = '';
+}
+
 function instantiateComponent(element) {
   const type = element.type;
   if (typeof type === 'function') {
@@ -61,4 +65,5 @@ class HostComponent {
   }
 }
 
-export default render;
+const ScheduleDOM = { render, unmountComponentAtNode };
+export default ScheduleDOM;

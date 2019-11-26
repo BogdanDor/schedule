@@ -1,4 +1,4 @@
-import render from '../index';
+import ScheduleDOM from '../index';
 import { JSDOM } from 'jsdom';
 
 let container;
@@ -13,7 +13,7 @@ beforeEach(() => {
 });
 
 test('should mount element to container', function() {
-  render({
+  ScheduleDOM.render({
     type: 'div',
     props: { children: [] }
   }, container);
@@ -33,7 +33,7 @@ test('should expand tree', function() {
       props: { children: [] }
     }; 
   }
-  render({
+  ScheduleDOM.render({
     type: ExternalComponent,
     props: { children: [] }
   }, container);
@@ -56,9 +56,16 @@ test('should expand tree that contains composite component inside host', functio
       }]}
     };
   }
-  render({
+  ScheduleDOM.render({
     type: ExternalComponent,
     props: { children: [] }
   }, container);
   expect(container.outerHTML).toEqual('<div id="container"><div><div></div></div></div>')
+});
+
+test('should clear container', function() {
+  container.innerHTML = '<div></div>';
+  expect(container.outerHTML).toEqual('<div id="container"><div></div></div>')
+  ScheduleDOM.unmountComponentAtNode(container);
+  expect(container.outerHTML).toEqual('<div id="container"></div>');
 });
