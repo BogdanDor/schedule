@@ -69,3 +69,13 @@ test('should clear container', function() {
   ScheduleDOM.unmountComponentAtNode(container);
   expect(container.outerHTML).toEqual('<div id="container"></div>');
 });
+
+test('should rerender component', function() {
+  container.innerHTML = '<div></div>';
+  expect(container.outerHTML).toEqual('<div id="container"><div></div></div>')
+  ScheduleDOM.render({
+    type: 'p',
+    props: { children: [] }
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><p></p></div>')
+});

@@ -1,5 +1,6 @@
 function render(element, container) {
   const rootComponent = instantiateComponent(element);
+  unmountComponentAtNode(container);
   container.appendChild(rootComponent.mount());
 }
 
