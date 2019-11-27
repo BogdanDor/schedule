@@ -100,6 +100,9 @@ class HostComponent {
         children.pop();
         node.removeChild(node.lastChild);
       }
+    } else {
+      const newNode = instantiateComponent(nextElement).mount();
+      node.parentNode.replaceChild(newNode, node);
     }
   }
 }

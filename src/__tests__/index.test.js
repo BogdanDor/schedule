@@ -157,3 +157,36 @@ test('should remove some nodes', function() {
   expect(removeChildMock).toHaveBeenCalledWith(img);
   expect(removeChildMock).toHaveBeenCalledTimes(2);
 });
+
+test('should replace some nodes', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: {children: []} },
+    ]}
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>')
+
+  const div = document.createElement('div');
+  const p = document.createElement('p');
+  const replaceChildMock = jest.fn();
+  Node.prototype.oldReplaceChild = Node.prototype.replaceChild;
+  Node.prototype.replaceChild = function(newElement, oldElement) {
+    const result = Node.prototype.oldReplaceChild.call(this, newElement, oldElement);
+    if (container.contains(this) || this === container) {
+      replaceChildMock(newElement, oldElement);
+    }
+    return result;
+  };
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'div', props: {children: []} },
+    ]}
+  }, container);
+
+  expect(container.outerHTML).toEqual('<div id="container"><div><div></div></div></div>')
+  expect(replaceChildMock).toHaveBeenCalledWith(div, p);
+  expect(replaceChildMock).toHaveBeenCalledTimes(1);
+});
