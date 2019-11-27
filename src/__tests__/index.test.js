@@ -118,3 +118,42 @@ test('should add few nodes', function() {
   expect(appendChildMock).toHaveBeenCalledWith(img);
   expect(appendChildMock).toHaveBeenCalledTimes(2);
 });
+
+test('should remove some nodes', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: { children: [
+        { type: 'button', props: {children: []} }
+      ]}},
+      { type: 'img', props: {children: []} },
+    ]}
+  }, container);
+  expect(container.outerHTML).toEqual(
+    '<div id="container"><div><p><button></button></p><img></div></div>'
+  );
+
+  const button = document.createElement('button');
+  const img = document.createElement('img');
+  const removeChildMock = jest.fn();
+  Node.prototype.oldRemoveChild = Node.prototype.removeChild;
+  Node.prototype.removeChild = function(element) {
+    const result = Node.prototype.oldRemoveChild.call(this, element);
+    if (container.contains(this) || this === container) {
+      removeChildMock(element);
+    }
+    return result;
+  };
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: {children: []} },
+    ]}
+  }, container);
+
+  expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>');
+  expect(removeChildMock).toHaveBeenCalledWith(button);
+  expect(removeChildMock).toHaveBeenCalledWith(img);
+  expect(removeChildMock).toHaveBeenCalledTimes(2);
+});

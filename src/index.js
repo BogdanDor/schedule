@@ -95,6 +95,11 @@ class HostComponent {
           children[i].receive(childElement);
         }
       });
+      const diff = children.length - nextProps.children.length;
+      for (let i=0; i<diff; i++) {
+        children.pop();
+        node.removeChild(node.lastChild);
+      }
     }
   }
 }
