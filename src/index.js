@@ -1,7 +1,16 @@
 function render(element, container) {
-  const rootComponent = instantiateComponent(element);
-  unmountComponentAtNode(container);
-  container.appendChild(rootComponent.mount());
+  let rootComponent;
+  if (container.firstChild) {
+    rootComponent = container.firstChild._internalInstance;
+  }
+  if (!rootComponent) {
+    rootComponent = instantiateComponent(element);
+    container.innerHTML = '';
+    container.appendChild(rootComponent.mount());
+    container.firstChild._internalInstance = rootComponent;
+  } else {
+    rootComponent.receive(element);
+  }
 }
 
 function unmountComponentAtNode(container) {
@@ -43,12 +52,14 @@ class CompositeComponent {
 class HostComponent {
   constructor(element) {
     this.currentElement = element;
+    this.children = [];
     this.node = null;
   }
 
   mount() {
     const type = this.currentElement.type;
     const props = this.currentElement.props;
+    const children = this.children;
     let node = this.node;
     node = document.createElement(type);
     Object.keys(props).forEach(propName => {
@@ -60,9 +71,31 @@ class HostComponent {
       const childComponent = instantiateComponent(child);
       const childNode = childComponent.mount();
       node.appendChild(childNode);
+      children.push(childComponent);
     });
     this.node = node;
     return node;
+  }
+
+  receive(nextElement) {
+    const currentType = this.currentElement.type;
+    const currentProps = this.currentElement.props;
+    const nextType = nextElement.type;
+    const nextProps = nextElement.props;
+    const children = this.children;
+    const node = this.node;
+    if (nextType === currentType) {
+      nextProps.children.forEach((childElement, i) => {
+        if (i >= children.length) {
+          const childComponent = instantiateComponent(childElement);
+          const childNode = childComponent.mount();
+          children.push(childComponent);
+          node.appendChild(childNode);
+        } else {
+          children[i].receive(childElement);
+        }
+      });
+    }
   }
 }
 

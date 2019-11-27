@@ -79,3 +79,42 @@ test('should rerender component', function() {
   }, container);
   expect(container.outerHTML).toEqual('<div id="container"><p></p></div>')
 });
+
+test('should add few nodes', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: {children: []} },
+    ]}
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>')
+
+  const button = document.createElement('button');
+  const img = document.createElement('img');
+  const appendChildMock = jest.fn();
+  Node.prototype.oldAppendChild = Node.prototype.appendChild;
+  Node.prototype.appendChild = function(element) {
+    const result = Node.prototype.oldAppendChild.call(this, element);
+    if (container.contains(this) || this === container) {
+      appendChildMock(element);
+    }
+    return result;
+  };
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: { children: [
+        { type: 'button', props: {children: []} }
+      ]}},
+      { type: 'img', props: {children: []} },
+    ]}
+  }, container);
+
+  expect(container.outerHTML).toEqual(
+    '<div id="container"><div><p><button></button></p><img></div></div>'
+  );
+  expect(appendChildMock).toHaveBeenCalledWith(button);
+  expect(appendChildMock).toHaveBeenCalledWith(img);
+  expect(appendChildMock).toHaveBeenCalledTimes(2);
+});
