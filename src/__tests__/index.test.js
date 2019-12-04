@@ -190,3 +190,37 @@ test('should replace some nodes', function() {
   expect(replaceChildMock).toHaveBeenCalledWith(div, p);
   expect(replaceChildMock).toHaveBeenCalledTimes(1);
 });
+
+test('should add some composite components', function() {
+  const renderMock = jest.fn();
+  function Button() { 
+    renderMock();
+    return { type: 'button', props: {children: []} } 
+  };
+  function Image() {
+    renderMock();
+    return { type: 'img', props: {children: []} } 
+  };
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: {children: []} },
+    ]}
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>')
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: { children: [
+        { type: Button, props: {children: []} }
+      ]}},
+      { type: Image, props: {children: []} },
+    ]}
+  }, container);
+
+  expect(container.outerHTML).toEqual(
+    '<div id="container"><div><p><button></button></p><img></div></div>'
+  );
+  expect(renderMock).toHaveBeenCalledTimes(2);
+});
