@@ -80,6 +80,7 @@ test('should rerender component', function() {
   expect(container.outerHTML).toEqual('<div id="container"><p></p></div>')
 });
 
+
 test('should add few nodes', function() {
   ScheduleDOM.render({
     type: 'div',
@@ -87,7 +88,32 @@ test('should add few nodes', function() {
       { type: 'p', props: {children: []} },
     ]}
   }, container);
+
   expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>')
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: { children: [
+        { type: 'button', props: {children: []} }
+      ]}},
+      { type: 'img', props: {children: []} },
+    ]}
+  }, container);
+
+  expect(container.outerHTML).toEqual(
+    '<div id="container"><div><p><button></button></p><img></div></div>'
+  );
+});
+
+
+test('should add few nodes with minimum dom operations', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: {children: []} },
+    ]}
+  }, container);
 
   const button = document.createElement('button');
   const img = document.createElement('img');
@@ -111,13 +137,11 @@ test('should add few nodes', function() {
     ]}
   }, container);
 
-  expect(container.outerHTML).toEqual(
-    '<div id="container"><div><p><button></button></p><img></div></div>'
-  );
   expect(appendChildMock).toHaveBeenCalledWith(button);
   expect(appendChildMock).toHaveBeenCalledWith(img);
   expect(appendChildMock).toHaveBeenCalledTimes(2);
-});
+}); 
+
 
 test('should remove some nodes', function() {
   ScheduleDOM.render({
@@ -129,9 +153,32 @@ test('should remove some nodes', function() {
       { type: 'img', props: {children: []} },
     ]}
   }, container);
+
   expect(container.outerHTML).toEqual(
     '<div id="container"><div><p><button></button></p><img></div></div>'
   );
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: {children: []} },
+    ]}
+  }, container);
+
+  expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>');
+});
+
+
+test('should remove some nodes with minimum dom operations', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: { children: [
+        { type: 'button', props: {children: []} }
+      ]}},
+      { type: 'img', props: {children: []} },
+    ]}
+  }, container);
 
   const button = document.createElement('button');
   const img = document.createElement('img');
@@ -152,11 +199,11 @@ test('should remove some nodes', function() {
     ]}
   }, container);
 
-  expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>');
   expect(removeChildMock).toHaveBeenCalledWith(button);
   expect(removeChildMock).toHaveBeenCalledWith(img);
   expect(removeChildMock).toHaveBeenCalledTimes(2);
 });
+
 
 test('should replace some nodes', function() {
   ScheduleDOM.render({
@@ -165,7 +212,27 @@ test('should replace some nodes', function() {
       { type: 'p', props: {children: []} },
     ]}
   }, container);
+
   expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>')
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'div', props: {children: []} },
+    ]}
+  }, container);
+
+  expect(container.outerHTML).toEqual('<div id="container"><div><div></div></div></div>')
+});
+
+
+test('should replace some nodes with minimum dom operations', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [
+      { type: 'p', props: {children: []} },
+    ]}
+  }, container);
 
   const div = document.createElement('div');
   const p = document.createElement('p');
@@ -186,27 +253,26 @@ test('should replace some nodes', function() {
     ]}
   }, container);
 
-  expect(container.outerHTML).toEqual('<div id="container"><div><div></div></div></div>')
   expect(replaceChildMock).toHaveBeenCalledWith(div, p);
   expect(replaceChildMock).toHaveBeenCalledTimes(1);
 });
 
+
 test('should add some composite components', function() {
-  const renderMock = jest.fn();
   function Button() { 
-    renderMock();
     return { type: 'button', props: {children: []} } 
   };
   function Image() {
-    renderMock();
     return { type: 'img', props: {children: []} } 
   };
+
   ScheduleDOM.render({
     type: 'div',
     props: { children: [
       { type: 'p', props: {children: []} },
     ]}
   }, container);
+  
   expect(container.outerHTML).toEqual('<div id="container"><div><p></p></div></div>')
 
   ScheduleDOM.render({
@@ -222,5 +288,4 @@ test('should add some composite components', function() {
   expect(container.outerHTML).toEqual(
     '<div id="container"><div><p><button></button></p><img></div></div>'
   );
-  expect(renderMock).toHaveBeenCalledTimes(2);
 });
