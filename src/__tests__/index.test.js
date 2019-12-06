@@ -289,3 +289,37 @@ test('should add some composite components', function() {
     '<div id="container"><div><p><button></button></p><img></div></div>'
   );
 });
+
+test('node with props', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: {
+      id: 'test-item',
+      children: []
+    }
+  }, container);
+  expect(container.outerHTML).toEqual(
+    '<div id="container"><div id="test-item"></div></div>'
+  );
+});
+
+test('composite component with props', function() {
+  function TestComponent(props) {
+    return {
+      type: 'div',
+      props: {
+        id: props.id,
+        children: []
+      }
+    }
+  }
+  ScheduleDOM.render({
+    type: TestComponent,
+    props: {
+      id: 'test-component',
+    }
+  }, container);
+  expect(container.outerHTML).toEqual(
+    '<div id="container"><div id="test-component"></div></div>'
+  );
+});
