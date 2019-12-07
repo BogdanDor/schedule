@@ -323,3 +323,13 @@ test('composite component with props', function() {
     '<div id="container"><div id="test-component"></div></div>'
   );
 });
+
+test('render text', function() {
+  ScheduleDOM.render({
+    type: 'p', 
+    props: {
+      children: ['text']
+    }
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><p>text</p></div>')
+});

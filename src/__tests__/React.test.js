@@ -44,3 +44,11 @@ test('create composite element', function() {
     props: { children: [] }
   });
 });
+
+test('create element with text', function() {
+  const element = <p>text</p>;
+  expect(element).toEqual({
+    type: 'p',
+    props: { children: ['text'] }
+  });
+});

@@ -23,6 +23,8 @@ function instantiateComponent(element) {
     return new CompositeComponent(element);
   } else if (isHostElement(type)) {
     return new HostComponent(element);
+  } else if (typeof element === 'string') {
+    return new TextComponent(element);
   }
 }
 
@@ -104,6 +106,15 @@ class HostComponent {
       const newNode = instantiateComponent(nextElement).mount();
       node.parentNode.replaceChild(newNode, node);
     }
+  }
+}
+
+class TextComponent {
+  constructor(textValue) {
+    this.node = document.createTextNode(textValue);
+  }
+  mount() {
+    return this.node;
   }
 }
 
