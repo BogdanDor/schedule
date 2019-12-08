@@ -1,5 +1,6 @@
 import ScheduleDOM from '../index';
 import { JSDOM } from 'jsdom';
+import Component from '../Component';
 
 let container;
 
@@ -332,4 +333,43 @@ test('render text', function() {
     }
   }, container);
   expect(container.outerHTML).toEqual('<div id="container"><p>text</p></div>')
+});
+
+test ('render ES6 class', function() {
+  class TestComponent extends Component {
+    constructor(props) {
+      super(props);
+    }
+    render() {
+      return {
+        type: 'p',
+        props: { children: ['Class Component'] }
+      };
+    }
+  }
+  ScheduleDOM.render({
+    type: TestComponent,
+    props: { children: [] }
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><p>Class Component</p></div>');
+});
+
+test('should render state', function() {
+  class TestComponent extends Component {
+    constructor(props) {
+      super(props);
+      this.state = { text: 'current state'}
+    }
+    render() {
+      return {
+        type: 'p',
+        props: { children: [this.state.text] }
+      };
+    }
+  }
+  ScheduleDOM.render({
+    type: TestComponent,
+    props: { children: [] }
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><p>current state</p></div>');
 });

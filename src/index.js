@@ -1,3 +1,5 @@
+import Component from './Component';
+
 function render(element, container) {
   let rootComponent;
   if (container.firstChild) {
@@ -33,6 +35,10 @@ function isHostElement(typeOfElement) {
   return types.includes(typeOfElement);
 }
 
+function isClass(type) {
+  return Object.getPrototypeOf(type) === Component;
+}
+
 class CompositeComponent {
   constructor(element) {
     this.currentElement = element;
@@ -44,7 +50,11 @@ class CompositeComponent {
     const props = this.currentElement.props;
     let renderedComponent = this.renderedComponent;
     let renderedElement;
-    renderedElement = type(props);
+    if (isClass(type)) {
+      renderedElement = (new type(props)).render();
+    } else {
+      renderedElement = type(props);
+    }
     renderedComponent = instantiateComponent(renderedElement);
     this.renderedComponent = renderedComponent;
     return renderedComponent.mount();
