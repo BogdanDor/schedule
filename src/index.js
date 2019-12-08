@@ -6,7 +6,7 @@ function render(element, container) {
     rootComponent = container.firstChild._internalInstance;
   }
   if (!rootComponent) {
-    rootComponent = instantiateComponent(element);
+    rootComponent = instantiateComponent(element, element, container);
     container.innerHTML = '';
     container.appendChild(rootComponent.mount());
     container.firstChild._internalInstance = rootComponent;
@@ -19,12 +19,12 @@ function unmountComponentAtNode(container) {
   container.innerHTML = '';
 }
 
-function instantiateComponent(element) {
+function instantiateComponent(element, rootElement, rootContainer) {
   const type = element.type;
   if (typeof type === 'function') {
-    return new CompositeComponent(element);
+    return new CompositeComponent(element, rootElement, rootContainer);
   } else if (isHostElement(type)) {
-    return new HostComponent(element);
+    return new HostComponent(element, rootElement, rootContainer);
   } else if (typeof element === 'string') {
     return new TextComponent(element);
   }
@@ -40,9 +40,11 @@ function isClass(type) {
 }
 
 class CompositeComponent {
-  constructor(element) {
+  constructor(element, rootElement, rootContainer) {
     this.currentElement = element;
     this.renderedComponent = null;
+    this.rootElement = rootElement;
+    this.rootContainer = rootContainer;
   }
 
   mount() {
@@ -51,21 +53,26 @@ class CompositeComponent {
     let renderedComponent = this.renderedComponent;
     let renderedElement;
     if (isClass(type)) {
-      renderedElement = (new type(props)).render();
+      const component = new type(props);
+      component.setRootElement(this.rootElement);
+      component.setRootContainer(this.rootContainer);
+      renderedElement = component.render();
     } else {
       renderedElement = type(props);
     }
-    renderedComponent = instantiateComponent(renderedElement);
+    renderedComponent = instantiateComponent(renderedElement, this.rootElement, this.rootContainer);
     this.renderedComponent = renderedComponent;
     return renderedComponent.mount();
   }
 }
 
 class HostComponent {
-  constructor(element) {
+  constructor(element, rootElement, rootContainer) {
     this.currentElement = element;
     this.children = [];
     this.node = null;
+    this.rootElement = rootElement;
+    this.rootContainer = rootContainer;
   }
 
   mount() {
@@ -80,7 +87,7 @@ class HostComponent {
       }
     });
     props.children.forEach(child => {
-      const childComponent = instantiateComponent(child);
+      const childComponent = instantiateComponent(child, this.rootElement, this.rootContainer);
       const childNode = childComponent.mount();
       node.appendChild(childNode);
       children.push(childComponent);
@@ -99,7 +106,7 @@ class HostComponent {
     if (nextType === currentType) {
       nextProps.children.forEach((childElement, i) => {
         if (i >= children.length) {
-          const childComponent = instantiateComponent(childElement);
+          const childComponent = instantiateComponent(childElement, this.rootElement, this.rootContainer);
           const childNode = childComponent.mount();
           children.push(childComponent);
           node.appendChild(childNode);
@@ -113,7 +120,7 @@ class HostComponent {
         node.removeChild(node.lastChild);
       }
     } else {
-      const newNode = instantiateComponent(nextElement).mount();
+      const newNode = instantiateComponent(nextElement, this.rootElement, this.rootContainer).mount();
       node.parentNode.replaceChild(newNode, node);
     }
   }

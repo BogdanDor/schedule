@@ -335,6 +335,7 @@ test('render text', function() {
   expect(container.outerHTML).toEqual('<div id="container"><p>text</p></div>')
 });
 
+
 test ('render ES6 class', function() {
   class TestComponent extends Component {
     constructor(props) {
@@ -354,6 +355,7 @@ test ('render ES6 class', function() {
   expect(container.outerHTML).toEqual('<div id="container"><p>Class Component</p></div>');
 });
 
+
 test('should render state', function() {
   class TestComponent extends Component {
     constructor(props) {
@@ -372,4 +374,57 @@ test('should render state', function() {
     props: { children: [] }
   }, container);
   expect(container.outerHTML).toEqual('<div id="container"><p>current state</p></div>');
+});
+
+
+test('method render should set root element to stateful component', function() {
+  class TestComponent extends Component {
+    constructor(props) {
+      super(props);
+    }
+    render() {
+      return {
+        type: 'p',
+        props: { children: ['Class Component'] }
+      };
+    }
+  }
+
+  TestComponent.prototype.setRootElement = jest.fn();
+  const rootElement = {
+    type: 'div',
+    props: { children: [{
+      type: TestComponent,
+      props: { children: [] }
+    }]}
+  };
+
+  ScheduleDOM.render(rootElement, container);
+  expect(TestComponent.prototype.setRootElement).toHaveBeenCalledWith(rootElement);
+});
+
+
+test('method render should set root container to stateful component', function() {
+  class TestComponent extends Component {
+    constructor(props) {
+      super(props);
+    }
+    render() {
+      return {
+        type: 'p',
+        props: { children: ['Class Component'] }
+      };
+    }
+  }
+
+  TestComponent.prototype.setRootContainer = jest.fn();
+
+  ScheduleDOM.render({
+    type: 'div',
+    props: { children: [{
+      type: TestComponent,
+      props: { children: [] }
+    }]}
+  }, container);
+  expect(TestComponent.prototype.setRootContainer).toHaveBeenCalledWith(container);
 });
