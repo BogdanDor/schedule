@@ -31,12 +31,21 @@ function instantiateComponent(element, rootElement, rootContainer) {
 }
 
 function isHostElement(typeOfElement) {
-  const types = ['a', 'button', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'li', 'ol', 'p', 'span', 'svg', 'ul'];
+  const types = ['a', 'button', 'div', 'h1', 'h2', 'h3', 'h4', 'h5', 'h6', 'img', 'li', 'ol', 'p', 'span', 'svg', 'ul', 'input', 'form'];
   return types.includes(typeOfElement);
 }
 
 function isClass(type) {
   return Object.getPrototypeOf(type) === Component;
+}
+
+function propToEventName(prop) {
+  const props = {
+    onClick: 'click',
+    onChange: 'input',
+    onSubmit: 'submit'
+  };
+  return props[prop];
 }
 
 class CompositeComponent {
@@ -84,6 +93,10 @@ class HostComponent {
     Object.keys(props).forEach(propName => {
       if (propName !== 'children') {
         node.setAttribute(propName, props[propName]);
+      }
+      const eventName = propToEventName(propName);
+      if (eventName) {
+        node.addEventListener(eventName, props[propName]);
       }
     });
     props.children.forEach(child => {

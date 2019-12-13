@@ -428,3 +428,17 @@ test('method render should set root container to stateful component', function()
   }, container);
   expect(TestComponent.prototype.setRootContainer).toHaveBeenCalledWith(container);
 });
+
+test('add event listener', function() {
+  const handleClick = jest.fn();
+  function TestComponent() {
+    return {
+      type: 'button',
+      props: { onClick: handleClick, children: [] }
+    };
+  }
+  EventTarget.prototype.addEventListener = jest.fn();
+  ScheduleDOM.render({type: TestComponent, props:{children: []}}, container);
+  expect(EventTarget.prototype.addEventListener).toHaveBeenCalledWith('click', handleClick);
+});
+
