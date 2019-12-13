@@ -52,3 +52,19 @@ test('create element with text', function() {
     props: { children: ['text'] }
   });
 });
+
+test('spread array', function() {
+  const result = React.createElement('div', null, [
+    {type: 'p', props: {children: []}},
+    {type: 'p', props: {children: []}},
+    {type: 'p', props: {children: []}}
+  ]);
+  expect(result).toEqual({
+    type: 'div',
+    props: { children: [
+      {type: 'p', props: {children: []}},
+      {type: 'p', props: {children: []}},
+      {type: 'p', props: {children: []}}
+    ]}
+  }); 
+});
