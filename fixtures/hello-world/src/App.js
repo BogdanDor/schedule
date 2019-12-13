@@ -1,4 +1,4 @@
-import React from '/node_modules/schedule/src/React.js';
+import React from '/node_modules/schedule/dist/React.js';
 
 function App() {
 	return {

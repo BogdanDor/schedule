@@ -1,5 +1,5 @@
-import Component from '../Component';
-import ScheduleDOM from '../index';
+import Component from '../src/Component';
+import ScheduleDOM from '../src/index';
 
 test('setState should call rerender', function() {
 	const testComponent = new Component();

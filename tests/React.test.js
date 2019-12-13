@@ -1,4 +1,4 @@
-import React from '../React';
+import React from '../src/React';
 
 test('create empty element', function () {
   const element = <div></div>;

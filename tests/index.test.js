@@ -1,6 +1,6 @@
-import ScheduleDOM from '../index';
+import ScheduleDOM from '../src/index';
 import { JSDOM } from 'jsdom';
-import Component from '../Component';
+import Component from '../src/Component';
 
 let container;
 
