@@ -1,4 +1,4 @@
-import ScheduleDOM from './index';
+import ScheduleDOM from './index.js';
 
 class Component {
 	constructor(props) {

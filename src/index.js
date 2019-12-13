@@ -1,4 +1,4 @@
-import Component from './Component';
+import Component from './Component.js';
 
 function render(element, container) {
   let rootComponent;
