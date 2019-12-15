@@ -11,7 +11,10 @@ function render(element, container) {
     container.appendChild(rootComponent.mount());
     container.firstChild._internalInstance = rootComponent;
   } else {
-    rootComponent.receive(element);
+    const prevElement = rootComponent.currentElement;
+    if (element.type === prevElement.type) {
+      rootComponent.receive(element);
+    }
   }
 }
 
@@ -54,6 +57,11 @@ class CompositeComponent {
     this.renderedComponent = null;
     this.rootElement = rootElement;
     this.rootContainer = rootContainer;
+    this.publicInstance = null;
+  }
+
+  getHostNode() {
+    return renderedComponent.getHostNode();
   }
 
   mount() {
@@ -66,12 +74,40 @@ class CompositeComponent {
       component.setRootElement(this.rootElement);
       component.setRootContainer(this.rootContainer);
       renderedElement = component.render();
+      this.publicInstance = component;
     } else {
       renderedElement = type(props);
     }
     renderedComponent = instantiateComponent(renderedElement, this.rootElement, this.rootContainer);
     this.renderedComponent = renderedComponent;
+    this.renderedElement = renderedElement;
     return renderedComponent.mount();
+  }
+
+  receive(nextElement) {
+    const currentType = this.currentElement.type;
+    const currentProps = this.currentElement.props;
+    const nextType = nextElement.type;
+    const nextProps = nextElement.props;
+    let renderedElement;
+    let renderedComponent = this.renderedComponent;
+    if (isClass(nextType)) {
+      const component = this.publicInstance;
+      component.props = nextProps;
+      renderedElement = component.render();
+    } else {
+      renderedElement = nextType(nextProps);
+    }
+    if (nextType === currentType) {
+      renderedComponent.receive(renderedElement);
+    } else {
+      const prevNode = getHostNode();
+      renderedComponent = instantiateComponent(renderedElement, this.rootElement, this.rootContainer);
+      const nextNode = renderedComponent.mount();
+      prevNode.parentNode.replaceChild(nextNode, prevNode);
+    }
+    this.renderedElement = renderedElement;
+    this.renderedComponent = renderedComponent;
   }
 }
 
@@ -82,6 +118,10 @@ class HostComponent {
     this.node = null;
     this.rootElement = rootElement;
     this.rootContainer = rootContainer;
+  }
+
+  getHostNode() {
+    return this.node;
   }
 
   mount() {
@@ -116,25 +156,35 @@ class HostComponent {
     const nextProps = nextElement.props;
     const children = this.children;
     const node = this.node;
-    if (nextType === currentType) {
-      nextProps.children.forEach((childElement, i) => {
-        if (i >= children.length) {
-          const childComponent = instantiateComponent(childElement, this.rootElement, this.rootContainer);
-          const childNode = childComponent.mount();
-          children.push(childComponent);
-          node.appendChild(childNode);
-        } else {
-          children[i].receive(childElement);
-        }
-      });
-      const diff = children.length - nextProps.children.length;
-      for (let i=0; i<diff; i++) {
-        children.pop();
-        node.removeChild(node.lastChild);
+    Object.keys(currentProps).forEach(propName => {
+      if (propName !== 'children' && !nextProps.hasOwnProperty(propName)) {
+        node.removeAttribute(propName);
       }
-    } else {
-      const newNode = instantiateComponent(nextElement, this.rootElement, this.rootContainer).mount();
-      node.parentNode.replaceChild(newNode, node);
+    });
+    Object.keys(nextProps).forEach(propName => {
+      if (propName !== 'children') {
+        node.setAttribute(propName, nextProps[propName]);
+      }
+    });
+    nextProps.children.forEach((childElement, i) => {
+      if (i >= children.length) {
+	const childComponent = instantiateComponent(childElement, this.rootElement, this.rootContainer);
+        const childNode = childComponent.mount();
+        children.push(childComponent);
+        node.appendChild(childNode);
+      } else if (childElement.type === children[i].currentElement.type) {
+        children[i].receive(childElement);
+      } else {
+	const prevNode = children[i].getHostNode();
+	const childComponent = instantiateComponent(childElement, this.rootElement, this.rootContainer);
+	const nextNode = childComponent.mount();
+        node.replaceChild(nextNode, prevNode);
+      }
+    });
+    const diff = children.length - nextProps.children.length;
+    for (let i=0; i<diff; i++) {
+      children.pop();
+      node.removeChild(node.lastChild);
     }
   }
 }

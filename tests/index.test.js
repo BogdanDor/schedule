@@ -81,6 +81,35 @@ test('should rerender component', function() {
   expect(container.outerHTML).toEqual('<div id="container"><p></p></div>')
 });
 
+test('should rerender composite component', function() {
+  function TestComponent(props) {
+    return {
+      type: 'div',
+      props: { id:props.id, children: [] }
+    };
+  }
+  ScheduleDOM.render({
+    type: TestComponent,
+    props: { id: 'first', children: [] }
+  }, container);
+  ScheduleDOM.render({
+    type: TestComponent,
+    props: { id: 'second', children: [] }
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div id="second"></div></div>');
+});
+
+test('should update prop in host component', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { id: 'first', children: [] }
+  }, container);
+  ScheduleDOM.render({
+    type: 'div',
+    props: { id: 'second', children: [] }
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div id="second"></div></div>');
+});
 
 test('should add few nodes', function() {
   ScheduleDOM.render({
