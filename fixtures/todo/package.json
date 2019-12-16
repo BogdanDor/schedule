@@ -1,0 +1,15 @@
+{
+  "name": "todo",
+  "version": "0.0.1",
+  "description": "todo example",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "Bogdan Dor",
+  "license": "ISC",
+  "dependencies": {
+    "babel-cli": "^7.7.5",
+    "babel-preset-react-app": "^3.1.2"
+  }
+}
