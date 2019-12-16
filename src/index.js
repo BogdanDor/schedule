@@ -131,10 +131,10 @@ class HostComponent {
     let node = this.node;
     node = document.createElement(type);
     Object.keys(props).forEach(propName => {
-      if (propName !== 'children') {
-        node.setAttribute(propName, props[propName]);
-      }
       const eventName = propToEventName(propName);
+      if (propName !== 'children' && !eventName) {
+	node.setAttribute(propName, props[propName]);
+      }
       if (eventName) {
         node.addEventListener(eventName, props[propName]);
       }
@@ -161,8 +161,12 @@ class HostComponent {
         node.removeAttribute(propName);
       }
     });
+    if (nextProps.hasOwnProperty('value')) {
+      node.value = nextProps.value;
+    }
     Object.keys(nextProps).forEach(propName => {
-      if (propName !== 'children') {
+      const eventName = propToEventName(propName);
+      if (propName !== 'children' && !eventName) {
         node.setAttribute(propName, nextProps[propName]);
       }
     });
@@ -172,11 +176,12 @@ class HostComponent {
         const childNode = childComponent.mount();
         children.push(childComponent);
         node.appendChild(childNode);
-      } else if (childElement.type === children[i].currentElement.type) {
+      } else if ((typeof childElement !== 'string') && childElement.type === children[i].currentElement.type) {
         children[i].receive(childElement);
       } else {
 	const prevNode = children[i].getHostNode();
 	const childComponent = instantiateComponent(childElement, this.rootElement, this.rootContainer);
+	children[i] = childComponent;
 	const nextNode = childComponent.mount();
         node.replaceChild(nextNode, prevNode);
       }
@@ -193,6 +198,11 @@ class TextComponent {
   constructor(textValue) {
     this.node = document.createTextNode(textValue);
   }
+
+  getHostNode() {
+    return this.node;
+  }
+
   mount() {
     return this.node;
   }
