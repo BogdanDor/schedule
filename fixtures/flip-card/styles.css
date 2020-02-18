@@ -1,0 +1,67 @@
+body { margin: 0 }
+
+.app {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: space-between;
+  min-height: 100vh;
+  text-align: center;
+}
+.app__header {
+  padding: 16px 0;
+  background-color: aqua;
+}
+.app__main {
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  padding-top: 32px;
+}
+.app__buttons {
+  display: flex;
+  justify-content: space-around;
+  width: 120px;
+  padding: 24px;
+}
+.app__footer {
+  padding: 16px 0;
+  background-color: aqua;
+}
+
+.card {
+  width: 400px;
+  height: 200px;
+
+  background-color: transparent;
+  perspective: 1000px; /* Remove this if you don't want the 3D effect */
+}
+.card__inner {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  text-align: center;
+  transition: transform 0.8s;
+  transform-style: preserve-3d;
+}
+.card__inner--isBack {
+  transform: rotateY(180deg);
+}
+.card__front {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(16, 14, 143);
+  border-radius: 10px;
+  backface-visibility: hidden;
+}
+.card__back {
+  position: absolute;
+  width: 100%;
+  height: 100%;
+  background-color: rgb(180, 3, 27);
+  border-radius: 10px;
+  backface-visibility: hidden;
+  transform: rotateY(180deg);
+}
