@@ -471,3 +471,13 @@ test('add event listener', function() {
   expect(EventTarget.prototype.addEventListener).toHaveBeenCalledWith('click', handleClick);
 });
 
+test('html element should has class', function() {
+  ScheduleDOM.render({
+    type: 'div',
+    props: { 
+      className: 'myClass',
+      children: [] 
+    }
+  }, container);
+  expect(container.outerHTML).toEqual('<div id="container"><div class="myClass"></div></div>');
+});

@@ -132,11 +132,14 @@ class HostComponent {
     node = document.createElement(type);
     Object.keys(props).forEach(propName => {
       const eventName = propToEventName(propName);
-      if (propName !== 'children' && !eventName) {
-	node.setAttribute(propName, props[propName]);
+      if (propName !== 'children' && propName !== 'className' && !eventName) {
+	      node.setAttribute(propName, props[propName]);
       }
       if (eventName) {
         node.addEventListener(eventName, props[propName]);
+      }
+      if (propName === 'className') {
+        node.setAttribute('class', props[propName]);
       }
     });
     props.children.forEach(child => {
@@ -166,8 +169,11 @@ class HostComponent {
     }
     Object.keys(nextProps).forEach(propName => {
       const eventName = propToEventName(propName);
-      if (propName !== 'children' && !eventName) {
+      if (propName !== 'children' && propName !== 'className' && !eventName) {
         node.setAttribute(propName, nextProps[propName]);
+      }
+      if (propName === 'className') {
+        node.setAttribute('class', nextProps[propName]);
       }
     });
     nextProps.children.forEach((childElement, i) => {
